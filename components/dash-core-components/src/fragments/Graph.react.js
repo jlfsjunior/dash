@@ -200,28 +200,21 @@ class PlotlyGraph extends Component {
         const clearState = props.clearState;
         const dataArray = props[dataKey];
 
-        dataArray.forEach(data => {
-            let updateData, traceIndices, maxPoints;
-            if (Array.isArray(data) && typeof data[0] === 'object') {
-                [updateData, traceIndices, maxPoints] = data;
-            } else {
-                updateData = data;
+        [updateData, traceIndices, maxPoints] = dataArray;
+
+        if (!traceIndices) {
+            function getFirstProp(data) {
+                return data[Object.keys(data)[0]];
             }
 
-            if (!traceIndices) {
-                function getFirstProp(data) {
-                    return data[Object.keys(data)[0]];
-                }
-
-                function generateIndices(data) {
-                    return Array.from(Array(getFirstProp(data).length).keys());
-                }
-                traceIndices = generateIndices(updateData);
+            function generateIndices(data) {
+                return Array.from(Array(getFirstProp(data).length).keys());
             }
+            traceIndices = generateIndices(updateData);
+        }
 
-            const gd = this.gd.current;
-            return Plotly[plotlyFnKey](gd, updateData, traceIndices, maxPoints);
-        });
+        const gd = this.gd.current;
+        Plotly[plotlyFnKey](gd, updateData, traceIndices, maxPoints);
 
         clearState(dataKey);
     }
